@@ -7,12 +7,11 @@ module RakeNotification
 
   refine Rake::Application do
     def init(app_name='rake')
-      reconstruct_command_line
       super
     end
 
     def reconstructed_command_line
-      @reconstructed_command_line
+      @reconstructed_command_line ||= "#{File.basename($0)} #{ARGV.join(' ')}"
     end
 
     def register_observer(observer)
@@ -34,10 +33,6 @@ module RakeNotification
     end
 
     private
-
-    def reconstruct_command_line
-      @reconstructed_command_line = "#{File.basename($0)} #{ARGV.join(' ')}"
-    end
 
     def inform_interceptors
       notification_interceptors.each do |interceptor|
