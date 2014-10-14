@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+
+begin
+  require 'rubygems'
+  gem 'rake'
+rescue LoadError
+end
+
+require 'rake'
+require 'rake_notification'
+
+using RakeNotification
+
+if File.exist?(RakeNotification.config_path)
+  require RakeNotification.config_path
+end
+
+Rake.application.run
