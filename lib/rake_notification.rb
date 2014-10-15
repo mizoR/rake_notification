@@ -6,10 +6,6 @@ module RakeNotification
   end
 
   refine Rake::Application do
-    def init(app_name='rake')
-      super
-    end
-
     def reconstructed_command_line
       @reconstructed_command_line ||= "#{File.basename($0)} #{ARGV.join(' ')}"
     end
