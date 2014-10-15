@@ -11,8 +11,9 @@ require 'rake_notification'
 
 using RakeNotification
 
-if File.exist?(RakeNotification.config_path)
+begin
   require RakeNotification.config_path
+rescue LoadError
 end
 
 Rake.application.run

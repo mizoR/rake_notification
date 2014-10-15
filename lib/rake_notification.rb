@@ -2,7 +2,7 @@ require 'rake'
 
 module RakeNotification
   def self.config_path
-    './config/rake_notification.rb'
+    './config/rake_notification'
   end
 
   refine Rake::Application do
