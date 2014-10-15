@@ -6,7 +6,7 @@ Notification of status for rake
 
 Add this line to your application's Gemfile:
 
-    gem 'rake_notification', github: 'mizoR/rake_notification'
+    gem 'rake_notification'
 
 And then execute:
 
