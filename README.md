@@ -1,5 +1,7 @@
 # RakeNotification
 
+[![Build Status](https://img.shields.io/travis/mizoR/rake_notification/master.svg?style=flat)](https://travis-ci.org/mizoR/rake_notification)
+
 Notification of status for rake
 
 ## Installation
