@@ -9,7 +9,7 @@ end
 require 'rake'
 require 'rake_notification'
 
-using RakeNotification
+Rake.application.extend RakeNotification
 
 begin
   require RakeNotification.config_path

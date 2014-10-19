@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe RakeNotification do
-  using RakeNotification
-
   subject { app }
 
   let(:app) { Rake::Application.new }
@@ -10,6 +8,7 @@ describe RakeNotification do
   let(:notifier) { double('notifier') }
 
   before {
+    app.extend described_class
     allow(app).to receive(:invoke_task).and_return(true)
   }
 
