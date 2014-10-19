@@ -31,7 +31,7 @@ describe RakeNotification do
 
     before { app.register_interceptor notifier }
 
-    it '#started_task が実行されること' do
+    it 'should receive started_task' do
       should     receive(:started_task).with(app)
       should_not receive(:completed_task)
 
@@ -44,17 +44,17 @@ describe RakeNotification do
 
     before { app.register_observer notifier }
 
-    it '#completed_task が実行されること' do
+    it 'should receive completed_task' do
       should_not receive(:started_task)
       should     receive(:completed_task)
 
       app.run
     end
 
-    context 'タスクの実行中に例外が発生' do
+    context 'raise error on invoking task' do
       before { app.stub(:invoke_task).and_raise(StandardError.new('Rake Error')) }
 
-      it '#completed_task が実行されること' do
+      it 'should receive completed_task' do
         should_not receive(:started_task)
         should     receive(:completed_task).with(app, kind_of(SystemExit))
         begin
