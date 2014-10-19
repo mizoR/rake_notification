@@ -8,7 +8,8 @@ describe RakeNotification do
   let(:notifier) { double('notifier') }
 
   before {
-    app.extend described_class
+    class Rake::Application; prepend RakeNotification; end
+
     allow(app).to receive(:invoke_task).and_return(true)
   }
 

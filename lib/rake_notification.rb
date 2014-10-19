@@ -17,14 +17,18 @@ module RakeNotification
     notification_interceptors << interceptor
   end
 
-  def run
-    inform_interceptors
+  def top_level
+    inform_interceptors rescue nil
+
     super
-  rescue SystemExit => e
-    inform_observers(e)
-    raise e
+  rescue SystemExit => original_error
+    inform_observers(original_error) rescue raise original_error
+    raise original_error
+  rescue Exception => original_error
+    inform_observers(SystemExit.new(1, original_error.message)) rescue raise original_error
+    raise original_error
   else
-    inform_observers
+    inform_observers rescue nil
   end
 
   private
