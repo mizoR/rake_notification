@@ -1,4 +1,5 @@
 require 'rake'
+require 'rake_notifier'
 
 module RakeNotification
   def self.config_path
