@@ -9,7 +9,9 @@ end
 require 'rake'
 require 'rake_notification'
 
-using RakeNotification
+class Rake::Application
+  prepend RakeNotification
+end
 
 begin
   require RakeNotification.config_path
