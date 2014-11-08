@@ -5,6 +5,6 @@ describe RakeNotifier::Base do
 
   let(:anonymous_class) { Class.new(described_class) }
 
-  its(:hostname)  { should be_a String }
-  its(:rails_env) { should be_a String }
+  its(:hostname)  { is_expected.to be_a String }
+  its(:rails_env) { is_expected.to be_a String }
 end

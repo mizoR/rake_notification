@@ -12,6 +12,6 @@ describe RakeNotifier::Ikachan::Client do
 
     let(:path) { '/notice' }
 
-    its(:to_s) { should eq "#{url}#{path}" } 
+    its(:to_s) { is_expected.to eq "#{url}#{path}" } 
   end
 end

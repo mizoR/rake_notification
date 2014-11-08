@@ -6,6 +6,6 @@ describe RakeNotifier::Ikachan do
   let(:url) { 'https://irc.example.com' }
   let(:channel) { 4979 }
 
-  it { should respond_to? :started_task }
-  it { should respond_to? :completed_task }
+  it { is_expected.to respond_to :started_task }
+  it { is_expected.to respond_to :completed_task }
 end

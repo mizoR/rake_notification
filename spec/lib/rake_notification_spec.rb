@@ -15,14 +15,14 @@ describe RakeNotification do
 
   it { expect(described_class.config_path).to be_a String }
 
-  it { should be_respond_to :run }
+  it { is_expected.to be_respond_to :run }
 
   describe "#reconstruct_command_line" do
     subject { app.reconstructed_command_line }
 
     it {
       app.init
-      should be_a String
+      is_expected.to be_a String
     }
   end
 
@@ -32,8 +32,8 @@ describe RakeNotification do
     before { app.register_interceptor notifier }
 
     it 'should receive started_task' do
-      should     receive(:started_task).with(app)
-      should_not receive(:completed_task)
+      is_expected.to     receive(:started_task).with(app)
+      is_expected.not_to receive(:completed_task)
 
       app.run
     end
@@ -44,9 +44,9 @@ describe RakeNotification do
 
     before { app.register_observer notifier }
 
-    it 'should receive completed_task' do
-      should_not receive(:started_task)
-      should     receive(:completed_task)
+    it 'is_expected.to receive completed_task' do
+      is_expected.not_to receive(:started_task)
+      is_expected.to     receive(:completed_task)
 
       app.run
     end
@@ -55,8 +55,8 @@ describe RakeNotification do
       before { app.stub(:invoke_task).and_raise(StandardError.new('Rake Error')) }
 
       it 'should receive completed_task' do
-        should_not receive(:started_task)
-        should     receive(:completed_task).with(app, kind_of(SystemExit))
+        is_expected.not_to receive(:started_task)
+        is_expected.to     receive(:completed_task).with(app, kind_of(SystemExit))
         begin
           $stderr.reopen('/dev/null', 'w')
           app.run
