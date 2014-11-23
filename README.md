@@ -16,7 +16,43 @@ And then execute:
 
 ### Execution
 
-    $ bundle exec rake_notify your_task
+    $ bundle exec rake_notify awesome_task
+
+### Usage
+
+#### Ikachan Notifier
+
+```rb
+# config/rake_notification.rb
+
+endpoint = 'https://irc.example.com:4979/'
+channel  = '#rake_notification'
+ikachan  = RakeNotifier::Ikachan.new(endpoint, channel)
+
+Rake.application.register_intercepter ikachan
+Rake.application.register_observer    ikachan
+```
+
+#### Custom Notifier
+
+```rb
+# config/rake_notification.rb
+
+notifier = Object.new.tap do |o|
+  def o.started_task(task)
+    CustomNotifier.started(task).deliver
+  end
+
+  def o.completed_task(task, system_exit)
+    if !system_exit.success?
+      CustomNotifier.failed(task, system_exit)
+    end
+  end
+end
+
+Rake.application.register_intercepter notifier
+Rake.application.register_observer    notifier
+```
 
 ## Contributing
 

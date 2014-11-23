@@ -1,3 +1,5 @@
 require 'rspec'
+require 'rspec/its'
 require 'rake'
 require 'rake_notification'
+require 'rake_notifier'
