@@ -23,10 +23,10 @@ module RakeNotification
 
     super
   rescue SystemExit => original_error
-    inform_observers(original_error) rescue raise original_error
+    inform_observers(original_error) rescue nil
     raise original_error
   rescue Exception => original_error
-    inform_observers(SystemExit.new(1, original_error.message)) rescue raise original_error
+    inform_observers(SystemExit.new(1, original_error.message)) rescue nil
     raise original_error
   else
     inform_observers rescue nil
