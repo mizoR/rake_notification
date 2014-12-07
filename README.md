@@ -29,7 +29,7 @@ endpoint = 'https://irc.example.com:4979/'
 channel  = '#rake_notification'
 ikachan  = RakeNotifier::Ikachan.new(endpoint, channel)
 
-Rake.application.register_intercepter ikachan
+Rake.application.register_interceptor ikachan
 Rake.application.register_observer    ikachan
 ```
 
@@ -50,7 +50,7 @@ notifier = Object.new.tap do |o|
   end
 end
 
-Rake.application.register_intercepter notifier
+Rake.application.register_interceptor notifier
 Rake.application.register_observer    notifier
 ```
 
