@@ -1,5 +1,5 @@
 require 'active_support/core_ext/string/strip'
-require 'slack-notifier'
+require 'breacan'
 
 module RakeNotifier
   class Slack < Base
@@ -8,12 +8,9 @@ module RakeNotifier
     SUCCESS_LABEL = ":congratulations: *[SUCCESS]*"
     FAILED_LABEL  = ":x: *[FAILED]*"
 
-    def initialize(webhook_url, channel, icon: nil, username: nil)
-      @client = ::Slack::Notifier.new(webhook_url, channel: channel)
-      @client.username = username if username
-      @icon = icon
+    def initialize(token, channel, icon: nil, username: nil)
+      @client = Client.new(token, channel: channel, icon: icon, username: username)
     end
-    attr_reader :icon
 
     def started_task(task)
       notice <<-EOS.strip_heredoc
@@ -32,13 +29,43 @@ module RakeNotifier
 
     private
     def notice(msg)
-      if icon
-        @client.ping(
-          msg,
-          icon_url: icon
-        )
-      else
-        @client.ping(msg)
+      @client.ping(msg)
+    end
+
+    class Client
+      def initialize(token, channel: '#test', icon: nil, username: nil)
+        Breacan.access_token = @token = token
+        @channel = channel
+        @icon = icon
+        @username = username
+      end
+      attr_accessor :token, :channel, :icon, :username
+
+      def args_to_post(msg)
+        arg = {
+          channel: channel,
+          text: msg,
+          as_user: false,
+        }
+        arg[icon_key(icon)] = icon if icon
+        arg[:username] = username if username
+        arg
+      end
+
+      def ping(msg)
+        Breacan.chat_post_message(args_to_post(msg))
+      end
+
+      private
+      def icon_key(icon_info)
+        case icon_info
+        when /^https?:\/\//
+          :icon_url
+        when /^:.+:$/
+          :icon_emoji
+        else
+          raise "May be invalid icon format: #{icon_info}"
+        end
       end
     end
   end
