@@ -9,7 +9,7 @@ module RakeNotifier
     FAILED_LABEL  = ":x: *[FAILED]*"
 
     def initialize(webhook_url, channel, icon: nil, username: nil)
-      @client = Slack::Notifier.new(webhook_url, channel: channel)
+      @client = ::Slack::Notifier.new(webhook_url, channel: channel)
       @client.username = username if username
       @icon = icon
     end
