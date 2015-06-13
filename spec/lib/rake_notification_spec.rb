@@ -64,8 +64,6 @@ describe RakeNotification do
           app.run
         rescue SystemExit => e
           expect(e).not_to be_success
-        rescue => e
-          raise e
         else
           raise "Rake::Application#run should raise SystemExit, but did not."
         ensure
