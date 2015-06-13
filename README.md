@@ -30,10 +30,11 @@ notifier = Object.new.tap do |o|
     CustomNotifier.started(task).deliver
   end
 
-  def o.completed_task(task, system_exit)
-    if !system_exit.success?
-      CustomNotifier.failed(task, system_exit)
-    end
+  def o.completed_task(task, exception)
+    return if !exception
+    return if (exception === SystemExit) && exception.success?
+
+    CustomNotifier.failed(task, exception)
   end
 end
 
