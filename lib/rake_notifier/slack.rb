@@ -1,4 +1,5 @@
 require 'active_support/core_ext/string/strip'
+require 'active_support/core_ext/object/try'
 require 'breacan'
 
 module RakeNotifier
@@ -19,11 +20,14 @@ module RakeNotifier
       EOS
     end
 
-    def completed_task(task, system_exit)
-      label = system_exit.success? ? SUCCESS_LABEL : FAILED_LABEL
+    def completed_task(task, exception)
+      is_successfully = exception.try(:success?) || exception.nil?
+      failed_status   = exception.try(:status) || 1
+      label, status   = is_successfully ? [SUCCESS_LABEL, 0] : [FAILED_LABEL, failed_status]
+
       notice <<-EOS.strip_heredoc
         #{label} `$ #{task.reconstructed_command_line}`
-        >>> exit #{system_exit.status} from #{hostname} at #{Time.now} RAILS_ENV=#{rails_env}
+        >>> exit #{status} from #{hostname} at #{Time.now} RAILS_ENV=#{rails_env}
       EOS
     end
 
