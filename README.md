@@ -20,19 +20,6 @@ And then execute:
 
 ### Usage
 
-#### Ikachan Notifier
-
-```rb
-# config/rake_notification.rb
-
-endpoint = 'https://irc.example.com:4979/'
-channel  = '#rake_notification'
-ikachan  = RakeNotifier::Ikachan.new(endpoint, channel)
-
-Rake.application.register_interceptor ikachan
-Rake.application.register_observer    ikachan
-```
-
 #### Custom Notifier
 
 ```rb

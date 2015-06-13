@@ -1,7 +1,6 @@
 require 'socket'
 
 module RakeNotifier
-  autoload :Ikachan, File.join(__dir__, 'rake_notifier', 'ikachan')
   autoload :Slack, File.join(__dir__, 'rake_notifier', 'slack')
 
   class Base
