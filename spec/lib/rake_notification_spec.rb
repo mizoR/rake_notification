@@ -52,11 +52,13 @@ describe RakeNotification do
     end
 
     context 'raise error on invoking task' do
-      before { app.stub(:invoke_task).and_raise(StandardError.new('Rake Error')) }
+      let(:err) { StandardError.new('Rake Error') }
+
+      before { app.stub(:invoke_task).and_raise(err) }
 
       it 'should receive completed_task' do
         is_expected.not_to receive(:started_task)
-        is_expected.to     receive(:completed_task).with(app, kind_of(SystemExit))
+        is_expected.to     receive(:completed_task).with(app, err)
         begin
           $stderr.reopen('/dev/null', 'w')
           app.run

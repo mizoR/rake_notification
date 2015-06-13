@@ -28,14 +28,11 @@ module RakeNotification
     inform_interceptors rescue nil
 
     super
-  rescue SystemExit => original_error
-    inform_observers(original_error) rescue nil
-    raise original_error
-  rescue Exception => original_error
-    inform_observers(SystemExit.new(1, original_error.message)) rescue nil
-    raise original_error
-  else
-    inform_observers rescue nil
+  rescue Exception => e
+    err = e
+    raise
+  ensure
+    inform_observers(err) rescue nil
   end
 
   private
@@ -50,9 +47,9 @@ module RakeNotification
     end
   end
 
-  def inform_observers(system_exit=SystemExit.new(0))
+  def inform_observers(err=nil)
     notification_observers.each do |observer|
-      observer.completed_task(self, system_exit)
+      observer.completed_task(self, err)
     end
   end
 
