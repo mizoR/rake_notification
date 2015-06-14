@@ -31,9 +31,8 @@ describe RakeNotification do
 
     before { app.register_interceptor notifier }
 
-    it 'should receive started_task' do
-      is_expected.to     receive(:started_task).with(app)
-      is_expected.not_to receive(:completed_task)
+    it 'should be call on started task' do
+      is_expected.to receive(:call).with(app)
 
       app.run
     end
@@ -44,9 +43,8 @@ describe RakeNotification do
 
     before { app.register_observer notifier }
 
-    it 'is_expected.to receive completed_task' do
-      is_expected.not_to receive(:started_task)
-      is_expected.to     receive(:completed_task)
+    it 'should be call on completed task' do
+      is_expected.to receive(:call).with(app, nil)
 
       app.run
     end
@@ -56,9 +54,8 @@ describe RakeNotification do
 
       before { app.stub(:invoke_task).and_raise(err) }
 
-      it 'should receive completed_task' do
-        is_expected.not_to receive(:started_task)
-        is_expected.to     receive(:completed_task).with(app, err)
+      it 'should receive completed task' do
+        is_expected.to     receive(:call).with(app, err)
         begin
           $stderr.reopen('/dev/null', 'w')
           app.run

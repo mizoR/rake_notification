@@ -43,13 +43,13 @@ module RakeNotification
 
   def inform_interceptors
     notification_interceptors.each do |interceptor|
-      interceptor.started_task(self)
+      interceptor.call(self)
     end
   end
 
   def inform_observers(err=nil)
     notification_observers.each do |observer|
-      observer.completed_task(self, err)
+      observer.call(self, err)
     end
   end
 
