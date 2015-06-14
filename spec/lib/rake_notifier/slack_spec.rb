@@ -10,6 +10,16 @@ describe RakeNotifier::Slack do
   let(:icon) { nil }
   let(:task) { double(:reconstructed_command_line => 'rake sample') }
 
+  describe do
+    subject { notifiers }
+
+    let(:notifiers) { described_class.create_notifiers(token, channel, username: username, icon: icon) }
+
+    its(:size)  { is_expected.to eq 2 }
+    its(:first) { is_expected.to be_instance_of(described_class::StartedTask) }
+    its(:last)  { is_expected.to be_instance_of(described_class::CompletedTask) }
+  end
+
   shared_examples_for 'a slack client' do
     context 'variables' do
       subject { client }

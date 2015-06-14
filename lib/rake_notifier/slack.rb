@@ -4,6 +4,10 @@ require 'breacan'
 
 module RakeNotifier
   module Slack
+    def self.create_notifiers(*argv)
+      [StartedTask.new(*argv), CompletedTask.new(*argv)]
+    end
+
     class Base < RakeNotifier::Base
       START_LABEL   = ":construction: *[START]*"
       SUCCESS_LABEL = ":congratulations: *[SUCCESS]*"
