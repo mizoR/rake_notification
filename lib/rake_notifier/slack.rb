@@ -3,37 +3,46 @@ require 'active_support/core_ext/object/try'
 require 'breacan'
 
 module RakeNotifier
-  class Slack < Base
-
-    START_LABEL   = ":construction: *[START]*"
-    SUCCESS_LABEL = ":congratulations: *[SUCCESS]*"
-    FAILED_LABEL  = ":x: *[FAILED]*"
-
-    def initialize(token, channel, icon: nil, username: nil)
-      @client = Client.new(token, channel: channel, icon: icon, username: username)
+  module Slack
+    def self.create_notifiers(*argv)
+      [StartedTask.new(*argv), CompletedTask.new(*argv)]
     end
 
-    def started_task(task)
-      notice <<-EOS.strip_heredoc
+    class Base < RakeNotifier::Base
+      START_LABEL   = ":construction: *[START]*"
+      SUCCESS_LABEL = ":congratulations: *[SUCCESS]*"
+      FAILED_LABEL  = ":x: *[FAILED]*"
+
+      def initialize(token, channel, icon: nil, username: nil)
+        @client = Client.new(token, channel: channel, icon: icon, username: username)
+      end
+
+      private
+      def notice(msg)
+        @client.ping(msg)
+      end
+    end
+
+    class StartedTask < Base
+      def call(task)
+        notice <<-EOS.strip_heredoc
         #{START_LABEL} `$ #{task.reconstructed_command_line}`
         >>> from #{hostname} at #{Time.now} RAILS_ENV=#{rails_env}
-      EOS
+        EOS
+      end
     end
 
-    def completed_task(task, exception)
-      is_successfully = exception.try(:success?) || exception.nil?
-      failed_status   = exception.try(:status) || 1
-      label, status   = is_successfully ? [SUCCESS_LABEL, 0] : [FAILED_LABEL, failed_status]
+    class CompletedTask < Base
+      def call(task, exception)
+        is_successfully = exception.try(:success?) || exception.nil?
+        failed_status   = exception.try(:status) || 1
+        label, status   = is_successfully ? [SUCCESS_LABEL, 0] : [FAILED_LABEL, failed_status]
 
-      notice <<-EOS.strip_heredoc
+        notice <<-EOS.strip_heredoc
         #{label} `$ #{task.reconstructed_command_line}`
         >>> exit #{status} from #{hostname} at #{Time.now} RAILS_ENV=#{rails_env}
-      EOS
-    end
-
-    private
-    def notice(msg)
-      @client.ping(msg)
+        EOS
+      end
     end
 
     class Client

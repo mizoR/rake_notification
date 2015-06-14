@@ -25,21 +25,16 @@ And then execute:
 ```rb
 # config/rake_notification.rb
 
-notifier = Object.new.tap do |o|
-  def o.started_task(task)
-    CustomNotifier.started(task).deliver
-  end
-
-  def o.completed_task(task, exception)
-    return if !exception
-    return if (exception === SystemExit) && exception.success?
-
-    CustomNotifier.failed(task, exception)
-  end
+Rake.application.register_interceptor do |task|
+  CustomNotifier.started(task).deliver
 end
 
-Rake.application.register_interceptor notifier
-Rake.application.register_observer    notifier
+Rake.application.register_observer do |task, exception|
+  return if !exception
+  return if (exception === SystemExit) && exception.success?
+
+  CustomNotifier.failed(task, exception)
+end
 ```
 
 ## Contributing
