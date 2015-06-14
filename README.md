@@ -30,8 +30,8 @@ Rake.application.register_interceptor do |task|
 end
 
 Rake.application.register_observer do |task, exception|
-  return if !exception
-  return if (exception === SystemExit) && exception.success?
+  break if !exception
+  break if (exception === SystemExit) && exception.success?
 
   CustomNotifier.failed(task, exception)
 end
