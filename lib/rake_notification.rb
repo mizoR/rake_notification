@@ -10,12 +10,22 @@ module RakeNotification
     @reconstructed_command_line
   end
 
-  def register_observer(observer)
-    notification_observers << observer
+  def register_observer(observer=nil, &block)
+    if block_given?
+      warn "Block is given, so observer(#{observer.inspect}) will be ignored" if observer
+      notification_observers << block
+    else
+      notification_observers << observer
+    end
   end
 
-  def register_interceptor(interceptor)
-    notification_interceptors << interceptor
+  def register_interceptor(interceptor=nil, &block)
+    if block_given?
+      warn "Block is given, so interceptor(#{interceptor.inspect}) will be ignored" if interceptor
+      notification_interceptors << block
+    else
+      notification_interceptors << interceptor
+    end
   end
 
   def init

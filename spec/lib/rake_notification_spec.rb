@@ -29,44 +29,68 @@ describe RakeNotification do
   describe '#register_interceptor' do
     subject { notifier }
 
-    before { app.register_interceptor notifier }
+    shared_examples_for 'an intercepter' do
+      it 'should be call on started task' do
+        is_expected.to receive(:call).with(app)
 
-    it 'should be call on started task' do
-      is_expected.to receive(:call).with(app)
+        app.run
+      end
+    end
 
-      app.run
+    describe 'Instance notifier' do
+      before { app.register_interceptor notifier }
+
+      it_behaves_like 'an intercepter'
+    end
+
+    describe 'Proc notifier' do
+      before { app.register_interceptor {|task| notifier.call(task)} }
+
+      it_behaves_like 'an intercepter'
     end
   end
 
   describe '#register_observer' do
     subject { notifier }
 
-    before { app.register_observer notifier }
+    shared_examples_for 'an observer' do
+      it 'should be call on completed task' do
+        is_expected.to receive(:call).with(app, nil)
 
-    it 'should be call on completed task' do
-      is_expected.to receive(:call).with(app, nil)
+        app.run
+      end
 
-      app.run
-    end
+      context 'raise error on invoking task' do
+        let(:err) { StandardError.new('Rake Error') }
 
-    context 'raise error on invoking task' do
-      let(:err) { StandardError.new('Rake Error') }
+        before { app.stub(:invoke_task).and_raise(err) }
 
-      before { app.stub(:invoke_task).and_raise(err) }
-
-      it 'should receive completed task' do
-        is_expected.to     receive(:call).with(app, err)
-        begin
-          $stderr.reopen('/dev/null', 'w')
-          app.run
-        rescue SystemExit => e
-          expect(e).not_to be_success
-        else
-          raise "Rake::Application#run should raise SystemExit, but did not."
-        ensure
-          $stderr = STDERR
+        it 'should receive completed task' do
+          is_expected.to     receive(:call).with(app, err)
+          begin
+            $stderr.reopen('/dev/null', 'w')
+            app.run
+          rescue SystemExit => e
+            expect(e).not_to be_success
+          else
+            raise "Rake::Application#run should raise SystemExit, but did not."
+          ensure
+            $stderr = STDERR
+          end
         end
       end
+    end
+
+    describe 'Instance notifier' do
+      before { app.register_observer notifier }
+
+      it_behaves_like 'an observer'
+    end
+
+    describe 'Proc notifier' do
+      before { app.register_observer {|task, err| notifier.call(task, err) } }
+
+      it_behaves_like 'an observer'
     end
   end
 end
