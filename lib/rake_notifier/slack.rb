@@ -8,8 +8,12 @@ module RakeNotifier
     SUCCESS_LABEL = ":congratulations: *[SUCCESS]*"
     FAILED_LABEL  = ":x: *[FAILED]*"
 
-    def initialize(token, channel, icon: nil, username: nil)
+    def initialize(token, channel, icon: nil, username: nil, notice_when_fail: false)
       @client = Client.new(token, channel: channel, icon: icon, username: username)
+      @notice_when_fail = notice_when_fail
+      if @notice_when_fail and !@notice_when_fail.is_a?(String)
+        @notice_when_fail = "@channel"
+      end
     end
 
     def started_task(task)
@@ -20,9 +24,11 @@ module RakeNotifier
     end
 
     def completed_task(task, system_exit)
-      label = system_exit.success? ? SUCCESS_LABEL : FAILED_LABEL
+      success = system_exit.success?
+      label = success ? SUCCESS_LABEL : FAILED_LABEL
+      at_channel = (success or !@notice_when_fail) ? "" : " #{@notice_when_fail}"
       notice <<-EOS.strip_heredoc
-        #{label} `$ #{task.reconstructed_command_line}`
+        #{label} `$ #{task.reconstructed_command_line}`#{at_channel}
         >>> exit #{system_exit.status} from #{hostname} at #{Time.now} RAILS_ENV=#{rails_env}
       EOS
     end
