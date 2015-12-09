@@ -1,13 +1,14 @@
 require 'spec_helper'
 
 describe RakeNotifier::Slack do
-  let(:notifier) { described_class.new(token, channel, username: username, icon: icon) }
+  let(:notifier) { described_class.new(token, channel, username: username, icon: icon, notice_when_fail: notice_when_fail) }
   subject { notifier }
 
   let(:token) { 'xoxo-Example-T0k3N' }
   let(:channel) { '#rake_notification' }
   let(:username) { nil }
   let(:icon) { nil }
+  let(:notice_when_fail) { false }
   let(:task) { double(:reconstructed_command_line => 'rake sample') }
 
   it { is_expected.to respond_to :started_task }
@@ -48,5 +49,66 @@ describe RakeNotifier::Slack do
     end
 
     it { subject.started_task(task) }
+  end
+
+  context 'messages to post' do
+    now = Time.now
+    let(:time_now) { now }
+
+    before do
+      allow(Time).to receive(:now) { time_now }
+      allow(subject).to receive(:hostname) { 'rake.example.com' }
+
+      allow(subject).to receive(:notice) do |arg|
+        @string_to_be_posted = arg
+      end
+    end
+
+    describe 'on start' do
+      it {
+        subject.started_task(task)
+        expect(@string_to_be_posted).to eq(<<-EOS)
+:construction: *[START]* `$ rake sample`
+>>> from rake.example.com at #{time_now.to_s} RAILS_ENV=development
+        EOS
+      }
+    end
+
+    describe 'on success' do
+      let(:exit_status) { double(:success? => true, :status => 0) }
+
+      it {
+        subject.completed_task(task, exit_status)
+        expect(@string_to_be_posted).to eq(<<-EOS)
+:congratulations: *[SUCCESS]* `$ rake sample`
+>>> exit 0 from rake.example.com at #{time_now.to_s} RAILS_ENV=development
+        EOS
+      }
+    end
+
+    describe 'on failed' do
+      let(:exit_status) { double(:success? => false, :status => 127) }
+
+      it {
+        subject.completed_task(task, exit_status)
+        expect(@string_to_be_posted).to eq(<<-EOS)
+:x: *[FAILED]* `$ rake sample`
+>>> exit 127 from rake.example.com at #{time_now.to_s} RAILS_ENV=development
+        EOS
+      }
+    end
+
+    describe 'on failed when notice' do
+      let(:exit_status) { double(:success? => false, :status => 127) }
+      let(:notice_when_fail) { '@here' }
+
+      it {
+        subject.completed_task(task, exit_status)
+        expect(@string_to_be_posted).to eq(<<-EOS)
+:x: *[FAILED]* `$ rake sample` @here
+>>> exit 127 from rake.example.com at #{time_now.to_s} RAILS_ENV=development
+        EOS
+      }
+    end
   end
 end
