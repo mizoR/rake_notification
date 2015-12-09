@@ -33,6 +33,24 @@ Rake.application.register_interceptor ikachan
 Rake.application.register_observer    ikachan
 ```
 
+#### Slack Notifier
+
+```rb
+# config/rake_notification.rb
+
+token = 'xoxp-XXXXXXXXXXXXXX...'
+channel = '#rake_notification'
+slack = RakeNotifier::Slack.new(
+  token, channel,
+  icon: 'http://www.pubnub.com/docs/img/ruby.png',
+  username: 'rake result',
+  notice_when_fail: '@here' # false when not to make notice
+)
+
+Rake.application.register_interceptor slack
+Rake.application.register_observer    slack
+```
+
 #### Custom Notifier
 
 ```rb
