@@ -69,7 +69,7 @@ describe RakeNotifier::Slack do
         subject.started_task(task)
         expect(@string_to_be_posted).to eq(<<-EOS)
 :construction: *[START]* `$ rake sample`
->>> from rake.example.com at #{time_now.to_s} RAILS_ENV=development
+>>> from rake.example.com at #{time_now.to_s} RAILS_ENV=#{ENV['RAILS_ENV']}
         EOS
       }
     end
@@ -81,7 +81,7 @@ describe RakeNotifier::Slack do
         subject.completed_task(task, exit_status)
         expect(@string_to_be_posted).to eq(<<-EOS)
 :congratulations: *[SUCCESS]* `$ rake sample`
->>> exit 0 from rake.example.com at #{time_now.to_s} RAILS_ENV=development
+>>> exit 0 from rake.example.com at #{time_now.to_s} RAILS_ENV=#{ENV['RAILS_ENV']}
         EOS
       }
     end
@@ -93,7 +93,7 @@ describe RakeNotifier::Slack do
         subject.completed_task(task, exit_status)
         expect(@string_to_be_posted).to eq(<<-EOS)
 :x: *[FAILED]* `$ rake sample`
->>> exit 127 from rake.example.com at #{time_now.to_s} RAILS_ENV=development
+>>> exit 127 from rake.example.com at #{time_now.to_s} RAILS_ENV=#{ENV['RAILS_ENV']}
         EOS
       }
     end
@@ -106,7 +106,7 @@ describe RakeNotifier::Slack do
         subject.completed_task(task, exit_status)
         expect(@string_to_be_posted).to eq(<<-EOS)
 :x: *[FAILED]* `$ rake sample` @here
->>> exit 127 from rake.example.com at #{time_now.to_s} RAILS_ENV=development
+>>> exit 127 from rake.example.com at #{time_now.to_s} RAILS_ENV=#{ENV['RAILS_ENV']}
         EOS
       }
     end
