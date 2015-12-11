@@ -1,3 +1,5 @@
+ENV['RAILS_ENV'] ||= 'test'
+
 require 'rspec'
 require 'rspec/mocks'
 require 'rspec/its'
